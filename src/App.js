@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 //import styled from '@emotion/styled'
+import axios from 'axios';
 
 /* interface Photo {
   readonly albumId: number;
@@ -9,6 +10,7 @@ import { useEffect, useState } from 'react';
   readonly thumbnailUrl: string;
 } */
 
+  
 async function fetchPhotos() {
   const response = await fetch('http://date.jsontest.com');
   if(!response.ok){
@@ -19,9 +21,16 @@ async function fetchPhotos() {
   
   return transformedPhotod;
 }
-  
+
+export const jsonPlaceholderRequest = axios.create({
+  baseURL: 'https://jsonplaceholder.typicode.com/todos',
+  withCredentials: false,
+  timeout: 3000,
+});
+
 function StatusBar({photos, chPhotos, text}) {
   const [Photolist, setPhotolist] = useState(null);
+  const [todos, setTodos] = useState(null);
   
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/photos')
@@ -36,6 +45,29 @@ function StatusBar({photos, chPhotos, text}) {
 }
   }, [text]);
   
+  useEffect(() => {
+    console.log("call fetchTodos");
+    const fetchTodos = async () => {
+      try{
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/todos"
+        );
+        const response2 = await jsonPlaceholderRequest({
+
+          method: "GET"
+        });
+        setTodos(response2.data);
+        if(todos){
+          todos.map((todo) => {
+            console.log("todo : " + todo.title);
+          });
+        }
+      }catch(error){
+        console.log(error);
+      }
+    };
+    void fetchTodos();
+  }, [text]);
 
   
   return (
@@ -43,7 +75,14 @@ function StatusBar({photos, chPhotos, text}) {
   <ol>
   {Photolist && Photolist.map(photo => (
     //console.log(photo.title);
-    <li>{photo.title}</li>
+    <li key={photo.title}>{photo.title}</li>
+  ))}
+    </ol>
+  <ol>
+  <div>--------------------------------------------------</div>
+  {todos && todos.map(todo => (
+    //console.log(photo.title);
+    <li key={todo.title}>{todo.title}</li>
   ))}
   </ol>
   </>
