@@ -23,8 +23,12 @@ async function fetchPhotos() {
   return transformedPhotod;
 }
 
+export const jsonPlaceholderRequest = axios.create({
+  baseURL: 'http://localhost:8090/restboard/paging',
+  withCredentials: false,
+  timeout: 3000,
+});
 
-  
 
 export default function App() {
   const [text, setText] = useState('');
@@ -47,22 +51,32 @@ export default function App() {
     const fetchTodos = async () => {
       try{
         /* const response = await axios.get(
-          "http://localhost:8090/board/"
+          "http://localhost:8090/restboard/"
         ); */
-        /* const response2 = await jsonPlaceholderRequest({
+        /* const response = await jsonPlaceholderRequest({
 
           method: "GET"
         }); */
-        const response = await axios.create({
-          baseURL: 'http://localhost:8090/board/paging',
+        /* const response = await axios.create({
+          baseURL: 'http://localhost:8090/restboard/paging',
           withCredentials: false,
           timeout: 3000,
           method: "GET"
+        }); */
+        const axcreate = axios.create({
+          baseURL: 'http://localhost:8090/restboard/paging',
+          withCredentials: false,
+          timeout: 3000
         });
-        setboardList(response.data);
+        const response = await axcreate.get(
+          "http://localhost:8090/restboard/paging"
+        );
+        
+        setboardList(response.data.content);
+        console.log("response.data : " + response.data.content);
         if(boardList){
           boardList.map((board) => {
-            console.log("board : " + board.boardTitle);
+            console.log("board : " + board.content.boardTitle);
           });
         }
       }catch(error){
